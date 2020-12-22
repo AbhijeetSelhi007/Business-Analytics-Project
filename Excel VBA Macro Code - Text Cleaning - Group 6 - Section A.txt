@@ -1,0 +1,16 @@
+Function RemoveNonAlpha(str As String) As String
+    Dim ch, bytes() As Byte: bytes = str
+    For Each ch In bytes
+        If Chr(ch) Like "[A-Z.a-z ]" Then RemoveNonAlpha = RemoveNonAlpha & Chr(ch)
+    Next ch
+End Function
+
+Sub RemoveNonAlphaMacro()
+    Dim rng As Range
+    Set MyRange = Application.Selection
+    Set MyRange = Application.InputBox("Select One Range:", "RemoveNonAlphaMacro", MyRange.Address, Type:=8)
+
+    For Each rng In MyRange
+        rng.Value = RemoveNonAlpha(rng.Value)
+    Next
+End Sub

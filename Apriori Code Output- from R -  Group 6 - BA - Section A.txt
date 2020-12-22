@@ -1,0 +1,192 @@
+
+R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-w64-mingw32/x64 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+[Workspace loaded from E:/OneDrive - Institute of Management Technology/Term 5/Business Analytics/Project/final files/.RData]
+
+Loading required package: arules
+Loading required package: Matrix
+
+Attaching package: ‘arules’
+
+The following objects are masked from ‘package:base’:
+
+    abbreviate, write
+
+> # install.packages("pacman")
+> library(pacman)
+Warning messages:
+1: package ‘arules’ was built under R version 3.6.3 
+2: package ‘pacman’ was built under R version 3.6.3 
+> pacman::p_load(gdata,openxlsx,readxl, tibble, plyr, dplyr, arules, arulesViz, ggplot2)
+> setwd("C:\\Users\\Abhijeet\\Desktop")
+> 
+> 
+> tr <- read.transactions('tweetitems.csv', format = 'basket', sep=',')
+Error in file(con, "r") : cannot open the connection
+In addition: Warning message:
+In file(con, "r") :
+  cannot open file 'tweetitems.csv': No such file or directory
+> tr
+transactions in sparse format with
+ 342 transactions (rows) and
+ 196 items (columns)
+> summary(tr)
+transactions as itemMatrix in sparse format with
+ 342 rows (elements/itemsets/transactions) and
+ 196 columns (items) and a density of 0.00936866 
+
+most frequent items:
+   flowers chocolates      roses      cards      gifts    (Other) 
+        85         79         38         37         26        363 
+
+element (itemset/transaction) length distribution:
+sizes
+  1   2   3   4   5   7 
+146 134  41  16   4   1 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   1.000   2.000   1.836   2.000   7.000 
+
+includes extended item information - examples:
+   labels
+1 airtime
+2   arepa
+3     bag
+> 
+> itemFrequencyPlot(tr, topN=20, type='absolute')
+> 
+> rules <- apriori(tr, parameter = list(supp=0.01, conf=0.15))
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+       0.15    0.1    1 none FALSE            TRUE       5    0.01      1     10  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 3 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[196 item(s), 342 transaction(s)] done [0.00s].
+sorting and recoding items ... [25 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 done [0.00s].
+writing ... [12 rule(s)] done [0.00s].
+creating S4 object  ... done [0.00s].
+> rules <- sort(rules, by='confidence', decreasing = TRUE)
+> summary(rules)
+set of 12 rules
+
+rule length distribution (lhs + rhs):sizes
+ 1  2 
+ 2 10 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.000   2.000   2.000   1.833   2.000   2.000 
+
+summary of quality measures:
+    support          confidence        coverage            lift           count      
+ Min.   :0.01170   Min.   :0.1646   Min.   :0.03801   Min.   :0.819   Min.   : 4.00  
+ 1st Qu.:0.01974   1st Qu.:0.2205   1st Qu.:0.09576   1st Qu.:1.155   1st Qu.: 6.75  
+ Median :0.03947   Median :0.3038   Median :0.17105   Median :1.426   Median :13.50  
+ Mean   :0.07212   Mean   :0.2806   Mean   :0.28533   Mean   :1.453   Mean   :24.67  
+ 3rd Qu.:0.08187   3rd Qu.:0.3452   3rd Qu.:0.24854   3rd Qu.:1.491   3rd Qu.:28.00  
+ Max.   :0.24854   Max.   :0.3784   Max.   :1.00000   Max.   :3.214   Max.   :85.00  
+
+mining info:
+ data ntransactions support confidence
+   tr           342    0.01       0.15
+> inspect(rules[1:10])
+     lhs             rhs          support    confidence coverage   lift      count
+[1]  {cards}      => {flowers}    0.04093567 0.3783784  0.10818713 1.5224165 14   
+[2]  {dinner}     => {roses}      0.01461988 0.3571429  0.04093567 3.2142857  5   
+[3]  {chocolates} => {flowers}    0.08187135 0.3544304  0.23099415 1.4260611 28   
+[4]  {roses}      => {chocolates} 0.03801170 0.3421053  0.11111111 1.4810127 13   
+[5]  {flowers}    => {chocolates} 0.08187135 0.3294118  0.24853801 1.4260611 28   
+[6]  {wine}       => {chocolates} 0.01169591 0.3076923  0.03801170 1.3320351  4   
+[7]  {candies}    => {flowers}    0.01754386 0.3000000  0.05847953 1.2070588  6   
+[8]  {}           => {flowers}    0.24853801 0.2485380  1.00000000 1.0000000 85   
+[9]  {}           => {chocolates} 0.23099415 0.2309942  1.00000000 1.0000000 79   
+[10] {cards}      => {chocolates} 0.02046784 0.1891892  0.10818713 0.8190216  7   
+> 
+> rules <- apriori(tr, parameter = list(supp=0.015, conf=0.15))
+Apriori
+
+Parameter specification:
+ confidence minval smax arem  aval originalSupport maxtime support minlen maxlen target  ext
+       0.15    0.1    1 none FALSE            TRUE       5   0.015      1     10  rules TRUE
+
+Algorithmic control:
+ filter tree heap memopt load sort verbose
+    0.1 TRUE TRUE  FALSE TRUE    2    TRUE
+
+Absolute minimum support count: 5 
+
+set item appearances ...[0 item(s)] done [0.00s].
+set transactions ...[196 item(s), 342 transaction(s)] done [0.00s].
+sorting and recoding items ... [16 item(s)] done [0.00s].
+creating transaction tree ... done [0.00s].
+checking subsets of size 1 2 3 done [0.00s].
+writing ... [10 rule(s)] done [0.00s].
+creating S4 object  ... done [0.00s].
+> rules <- sort(rules, by='confidence', decreasing = FALSE)
+> summary(rules)
+set of 10 rules
+
+rule length distribution (lhs + rhs):sizes
+1 2 
+2 8 
+
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    1.0     2.0     2.0     1.8     2.0     2.0 
+
+summary of quality measures:
+    support          confidence        coverage            lift           count     
+ Min.   :0.01754   Min.   :0.1646   Min.   :0.05848   Min.   :0.819   Min.   : 6.0  
+ 1st Qu.:0.03801   1st Qu.:0.1996   1st Qu.:0.10892   1st Qu.:1.052   1st Qu.:13.0  
+ Median :0.04094   Median :0.2743   Median :0.23099   Median :1.426   Median :14.0  
+ Mean   :0.08392   Mean   :0.2702   Mean   :0.33450   Mean   :1.289   Mean   :28.7  
+ 3rd Qu.:0.08187   3rd Qu.:0.3389   3rd Qu.:0.24854   3rd Qu.:1.481   3rd Qu.:28.0  
+ Max.   :0.24854   Max.   :0.3784   Max.   :1.00000   Max.   :1.522   Max.   :85.0  
+
+mining info:
+ data ntransactions support confidence
+   tr           342   0.015       0.15
+> inspect(rules[1:10])
+     lhs             rhs          support    confidence coverage   lift      count
+[1]  {chocolates} => {roses}      0.03801170 0.1645570  0.23099415 1.4810127 13   
+[2]  {flowers}    => {cards}      0.04093567 0.1647059  0.24853801 1.5224165 14   
+[3]  {cards}      => {chocolates} 0.02046784 0.1891892  0.10818713 0.8190216  7   
+[4]  {}           => {chocolates} 0.23099415 0.2309942  1.00000000 1.0000000 79   
+[5]  {}           => {flowers}    0.24853801 0.2485380  1.00000000 1.0000000 85   
+[6]  {candies}    => {flowers}    0.01754386 0.3000000  0.05847953 1.2070588  6   
+[7]  {flowers}    => {chocolates} 0.08187135 0.3294118  0.24853801 1.4260611 28   
+[8]  {roses}      => {chocolates} 0.03801170 0.3421053  0.11111111 1.4810127 13   
+[9]  {chocolates} => {flowers}    0.08187135 0.3544304  0.23099415 1.4260611 28   
+[10] {cards}      => {flowers}    0.04093567 0.3783784  0.10818713 1.5224165 14   
+> 
+> 
+> topRules <- rules[1:10]
+> plot(topRules)
+> plot(rules)
+> 
+> plot(topRules, method="graph")
+> plot(rules, method = "graph")
+> 
+> plot(topRules, method = "grouped")
